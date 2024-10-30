@@ -1,6 +1,5 @@
 const express = require('express');
 const Code = require('../models/Code');
-const generateCodes = require('../utils/codeGenerator');
 const verifyCode = require('../controllers/codeController');
 const router = express.Router();
 
