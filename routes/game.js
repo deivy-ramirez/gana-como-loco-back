@@ -12,5 +12,6 @@ const router = express.Router();
     res.status(500).json({ message: 'Error al generar códigos' });
   }
 });*/
+router.post('/verify-code', verifyCode);
 
 module.exports = router;
