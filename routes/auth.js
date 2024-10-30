@@ -51,4 +51,18 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// ... tus rutas existentes ...
+
+router.post('/admin-login', async (req, res) => {
+  const { username, password } = req.body;
+  
+  // Aquí deberías verificar las credenciales del administrador contra tu base de datos
+  // Este es solo un ejemplo y no debe usarse en producción
+  if (username === 'admin' && password === 'password123') {
+    res.json({ adminKey: process.env.ADMIN_SECRET_KEY });
+  } else {
+    res.status(401).json({ message: 'Credenciales inválidas' });
+  }
+});
+
 module.exports = router;
