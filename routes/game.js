@@ -14,4 +14,6 @@ const router = express.Router();
   }
 });*/
 
+router.post('/verify-code', verifyCode);
+
 module.exports = router;
