@@ -1,10 +1,13 @@
 const express = require('express');
-const Code = require('../models/Code');
-const generateCodes = require('../utils/codeGenerator');
-const verifyCode = require('../controllers/codeController');
 const router = express.Router();
+const codeController = require('../controllers/codeController');
 
-/*router.post('/generate-codes', async (req, res) => {
+// Ruta para verificar códigos
+router.post('/verify-code', codeController.verifyCode);
+
+// Ruta para generar códigos (mantener comentada en producción)
+/*
+router.post('/generate-codes', async (req, res) => {
   try {
     const result = await generateCodes();
     res.json(result);
@@ -12,8 +15,7 @@ const router = express.Router();
     console.error('Error al generar códigos:', error);
     res.status(500).json({ message: 'Error al generar códigos' });
   }
-});*/
-
-router.post('/verify-code', verifyCode);
+});
+*/
 
 module.exports = router;

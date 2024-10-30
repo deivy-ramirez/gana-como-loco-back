@@ -1,6 +1,6 @@
 const Code = require('../models/Code');
 
-const verifyCode = async (req, res, next) => {
+exports.verifyCode = async (req, res, next) => {
   try {
     const { codigo, userId } = req.body;
     const code = await Code.findOne({ codigo, usado: false });
@@ -16,5 +16,3 @@ const verifyCode = async (req, res, next) => {
     next(error);
   }
 };
-
-exports.verifyCode = verifyCode;
