@@ -1,6 +1,6 @@
 const Code = require('../models/Code');
 
-const generateCodes = async () => {
+async function generateCodes() {
   const totalCodes = 1000;
   const winningCodes = 400;
   const prizes = [
@@ -15,7 +15,7 @@ const generateCodes = async () => {
   for (let prize of prizes) {
     for (let i = 0; i < prize.count; i++) {
       codes.push({
-        codigo: Math.floor(100 + Math.random() * 900).toString(),
+        codigo: Math.floor(100 + Math.random() * 900).toString(), // Código de 3 dígitos
         premio: prize.amount
       });
     }
@@ -36,9 +36,11 @@ const generateCodes = async () => {
   try {
     await Code.insertMany(codes);
     console.log('Códigos generados y guardados exitosamente');
+    return { success: true, message: 'Códigos generados y guardados exitosamente' };
   } catch (error) {
     console.error('Error al generar códigos:', error);
+    return { success: false, message: 'Error al generar códigos' };
   }
-};
+}
 
 module.exports = generateCodes;
