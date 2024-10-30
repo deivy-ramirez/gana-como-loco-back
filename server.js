@@ -13,15 +13,29 @@ app.use(cors({
 }));
 app.use(express.json());
 
-mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('Conexión a MongoDB establecida'))
-  .catch(err => console.error('Error al conectar a MongoDB:', err));
+mongoose.connect(process.env.MONGODB_URI, { 
+  useNewUrlParser: true, 
+  useUnifiedTopology: true 
+})
+.then(() => console.log('Conexión a MongoDB establecida'))
+.catch(err => {
+  console.error('Error al conectar a MongoDB:', err);
+  process.exit(1);
+});
 
 app.use('/api/auth', authRoutes);
 app.use('/api/game', gameRoutes);
 
 app.get('/', (req, res) => {
   res.send('API de Gana como Loco funcionando correctamente');
+});
+
+app.use((err, req, res, next) => {
+  console.error('Error en la aplicación:', err);
+  res.status(500).json({
+    message: 'Error interno del servidor',
+    error: process.env.NODE_ENV === 'production' ? {} : err
+  });
 });
 
 if (process.env.NODE_ENV !== 'production') {
