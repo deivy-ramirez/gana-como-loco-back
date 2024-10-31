@@ -1,6 +1,6 @@
 // controllers/adminController.js
 const User = require('../models/User');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 exports.createAdmin = async (req, res) => {
   const { nombre, cedula, correo, fechaNacimiento, password } = req.body;
