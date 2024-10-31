@@ -2,7 +2,7 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 
-exports.createAdmin = async (req, res) => {
+/*exports.createAdmin = async (req, res) => {
   const { nombre, cedula, correo, fechaNacimiento, password } = req.body;
 
   try {
@@ -30,4 +30,4 @@ exports.createAdmin = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: 'Error al crear el administrador', error });
   }
-};
+}; */
