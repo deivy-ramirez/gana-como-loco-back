@@ -1,54 +1,33 @@
 // controllers/adminController.js
 const User = require('../models/User');
-const Code = require('../models/Code');
-const Auth = require('../models/Auth');
+const bcrypt = require('bcrypt');
 
-exports.getUsers = async (req, res) => {
+exports.createAdmin = async (req, res) => {
+  const { nombre, cedula, correo, fechaNacimiento, password } = req.body;
+
   try {
-    const users = await User.find().select('-__v');
-    res.json(users);
+    // Verificar si el usuario ya existe
+    const existingUser  = await User.findOne({ correo });
+    if (existingUser ) {
+      return res.status(400).json({ message: 'El usuario ya existe' });
+    }
+
+    // Hashear la contraseña
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Crear un nuevo administrador
+    const newAdmin = new User({
+      nombre,
+      cedula,
+      correo,
+      fechaNacimiento,
+      password: hashedPassword,
+      isAdmin: true // Marcar este usuario como administrador
+    });
+
+    await newAdmin.save();
+    res.status(201).json({ message: 'Administrador creado exitosamente' });
   } catch (error) {
-    res.status(500).json({ message: 'Error al obtener usuarios' });
-  }
-};
-
-exports.getUserCodes = async (req, res) => {
-  try {
-    const codes = await Code.find({ usado: true })
-      .populate('usadoPor', 'nombre cedula')
-      .select('-__v')
-      .sort('-_id');
-
-    const formattedCodes = codes.map(code => ({
-      codigo: code.codigo,
-      premio: code.premio,
-      ganador: code.premio > 0 ? 'Sí' : 'No',
-      usuario: code.usadoPor ? code.usadoPor.nombre : 'N/A',
-      cedula: code.usadoPor ? code.usadoPor.cedula : 'N/A',
-      fechaUso: code._id.getTimestamp()
-    }));
-
-    res.json(formattedCodes);
-  } catch (error) {
-    res.status(500).json({ message: 'Error al obtener códigos' });
-  }
-};
-
-exports.getCodeStats = async (req, res) => {
-  try {
-    const totalCodes = await Code.countDocuments();
-    const usedCodes = await Code.countDocuments({ usado: true });
-    const winningCodesUsed = await Code.countDocuments({ usado: true, premio: { $gt: 0 } });
-    
-    const stats = {
-      totalCodes,
-      usedCodes,
-      availableCodes: totalCodes - usedCodes,
-      winningCodesUsed
-    };
-
-    res.json(stats);
-  } catch (error) {
-    res.status(500).json({ message: 'Error al obtener estadísticas' });
+    res.status(500).json({ message: 'Error al crear el administrador', error });
   }
 };
