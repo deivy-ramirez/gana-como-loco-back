@@ -37,4 +37,42 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// Obtener todos los usuarios
+router.get('/users', async (req, res) => {
+  try {
+    const users = await User.find();
+    const usersWithAuth = await Promise.all(
+      users.map(async (user) => {
+        const auth = await Auth.findOne({ userId: user._id });
+        return {
+          ...user._doc,
+          correo: auth ? auth.correo : null
+        };
+      })
+    );
+    res.json(usersWithAuth);
+  } catch (error) {
+    console.error('Error al obtener usuarios:', error);
+    res.status(500).json({ message: 'Error al obtener usuarios' });
+  }
+});
+
+// Obtener todos los códigos usados con información del usuario
+router.get('/codes', async (req, res) => {
+  try {
+    const codes = await Code.find({ usado: true })
+      .populate({
+        path: 'usadoPor',
+        model: 'User',
+        select: 'nombre cedula'
+      });
+    res.json(codes);
+  } catch (error) {
+    console.error('Error al obtener códigos:', error);
+    res.status(500).json({ message: 'Error al obtener códigos' });
+  }
+});
+
+module.exports = router;
+
 module.exports = router;
