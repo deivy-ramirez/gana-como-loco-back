@@ -2,54 +2,38 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
-const Admin = require('../models/Admin'); // Asegúrate de que la ruta sea correcta
+const Admin = require('../models/Admin');
 
-router.post('/register', async (req, res) => {
+// Ruta para el inicio de sesión del administrador
+router.post('/login', async (req, res) => {
   try {
-    const { username, nombre, cedula, correo, password, fechaNacimiento } = req.body;
+    const { username, password } = req.body;
 
-    // Verificar si el administrador ya existe
-    const existingAdmin = await Admin.findOne({ 
-      $or: [
-        { username: username },
-        { correo: correo },
-        { cedula: cedula }
-      ]
-    });
-
-    if (existingAdmin) {
-      return res.status(400).json({ 
-        message: 'El administrador ya existe (username, correo o cédula ya registrados)' 
-      });
+    // Buscar el admin por username
+    const admin = await Admin.findOne({ username });
+    if (!admin) {
+      return res.status(401).json({ message: 'Credenciales inválidas' });
     }
 
-    // Crear nuevo administrador
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newAdmin = new Admin({
-      username,
-      nombre,
-      cedula,
-      correo,
-      password: hashedPassword,
-      fechaNacimiento
-    });
+    // Verificar la contraseña
+    const isValidPassword = await bcrypt.compare(password, admin.password);
+    if (!isValidPassword) {
+      return res.status(401).json({ message: 'Credenciales inválidas' });
+    }
 
-    await newAdmin.save();
-
-    res.status(201).json({ 
-      message: 'Administrador registrado exitosamente',
+    // Enviar respuesta exitosa
+    res.json({
+      message: 'Inicio de sesión exitoso',
       admin: {
-        username: newAdmin.username,
-        nombre: newAdmin.nombre,
-        correo: newAdmin.correo
+        id: admin._id,
+        username: admin.username,
+        nombre: admin.nombre,
+        correo: admin.correo
       }
     });
   } catch (error) {
-    console.error('Error en registro:', error);
-    res.status(500).json({ 
-      message: 'Error al registrar administrador',
-      error: error.message 
-    });
+    console.error('Error en login:', error);
+    res.status(500).json({ message: 'Error en el inicio de sesión' });
   }
 });
 
