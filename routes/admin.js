@@ -68,8 +68,21 @@ router.get('/codes', async (req, res) => {
         path: 'usadoPor',
         model: 'User',
         select: 'nombre cedula'
-      });
-    res.json(codes);
+      })
+      .sort({ fechaUso: -1 }); // Ordenar por fecha de uso, más reciente primero
+
+    const codesWithUserInfo = codes.map(code => ({
+      _id: code._id,
+      codigo: code.codigo,
+      premio: code.premio,
+      fechaUso: code.fechaUso,
+      usuario: code.usadoPor ? {
+        nombre: code.usadoPor.nombre,
+        cedula: code.usadoPor.cedula
+      } : null
+    }));
+
+    res.json(codesWithUserInfo);
   } catch (error) {
     console.error('Error al obtener códigos:', error);
     res.status(500).json({ message: 'Error al obtener códigos' });

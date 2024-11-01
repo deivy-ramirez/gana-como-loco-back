@@ -7,6 +7,7 @@ exports.verifyCode = async (req, res, next) => {
     if (code) {
       code.usado = true;
       code.usadoPor = userId;
+      code.fechaUso = new Date();
       await code.save();
       res.json({ message: 'Código válido', premio: code.premio });
     } else {
