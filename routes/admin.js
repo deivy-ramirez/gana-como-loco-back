@@ -3,6 +3,9 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const Admin = require('../models/Admin');
+const User = require('../models/User');    // Añade esta línea
+const Auth = require('../models/Auth');    // Añade esta línea
+const Code = require('../models/Code');    // Añade esta línea
 
 // Ruta para el inicio de sesión del administrador
 router.post('/login', async (req, res) => {
