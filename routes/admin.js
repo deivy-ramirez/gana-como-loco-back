@@ -76,4 +76,27 @@ router.get('/codes', async (req, res) => {
   }
 });
 
+// Nueva ruta para estadísticas
+router.get('/stats', async (req, res) => {
+  try {
+    const totalUsers = await User.countDocuments();
+    const totalCodes = await Code.countDocuments();
+    const usedCodes = await Code.countDocuments({ usado: true });
+    const totalPrizeAmount = await Code.aggregate([
+      { $match: { usado: true } },
+      { $group: { _id: null, total: { $sum: "$premio" } } }
+    ]);
+
+    res.json({
+      totalUsers,
+      totalCodes,
+      usedCodes,
+      totalPrizeAmount: totalPrizeAmount[0]?.total || 0
+    });
+  } catch (error) {
+    console.error('Error al obtener estadísticas:', error);
+    res.status(500).json({ message: 'Error al obtener estadísticas' });
+  }
+});
+
 module.exports = router;
