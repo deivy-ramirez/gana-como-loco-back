@@ -1,4 +1,5 @@
 const Code = require('../models/Code');
+const CodeUsage = require('../models/CodeUsage');
 
 exports.verifyCode = async (req, res, next) => {
   try {
