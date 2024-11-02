@@ -49,7 +49,8 @@ router.get('/users', async (req, res) => {
         const auth = await Auth.findOne({ userId: user._id });
         return {
           ...user._doc,
-          correo: auth ? auth.correo : null
+          correo: auth ? auth.correo : null,
+          fechaRegistro: user.createdAt
         };
       })
     );
