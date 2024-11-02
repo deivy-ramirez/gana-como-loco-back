@@ -6,6 +6,7 @@ const Admin = require('../models/Admin');
 const User = require('../models/User');    // Añade esta línea
 const Auth = require('../models/Auth');    // Añade esta línea
 const Code = require('../models/Code');    // Añade esta línea
+const CodeUsage = require('../models/CodeUsage');
 
 // Ruta para el inicio de sesión del administrador
 router.post('/login', async (req, res) => {
@@ -64,23 +65,20 @@ router.get('/users', async (req, res) => {
 // Obtener todos los códigos usados con información del usuario
 router.get('/codes', async (req, res) => {
   try {
-    const codes = await Code.find({ usado: true })
-      .populate({
-        path: 'usadoPor',
-        model: 'User',
-        select: 'nombre cedula'
-      })
-      .sort({ fechaUso: -1 }); // Ordenar por fecha de uso, más reciente primero
+    const usages = await CodeUsage.find()
+      .populate('codeId', 'codigo premio') // Obtener información del código
+      .populate('userId', 'nombre cedula') // Obtener información del usuario
+      .sort({ fechaUso: -1 });
 
-    const codesWithUserInfo = codes.map(code => ({
-      _id: code._id,
-      codigo: code.codigo,
-      premio: code.premio,
-      fechaUso: code.fechaUso,
-      usuario: code.usadoPor ? {
-        nombre: code.usadoPor.nombre,
-        cedula: code.usadoPor.cedula
-      } : null
+    // Cambia el nombre de la variable para que no contenga espacios
+    const codesWithUserInfo = usages.map(usage => ({
+      codigo: usage.codeId.codigo,
+      premio: usage.codeId.premio,
+      fechaUso: usage.fechaUso,
+      usuario: {
+        nombre: usage.userId.nombre || 'No disponible',
+        cedula: usage.userId.cedula || 'No disponible'
+      }
     }));
 
     res.json(codesWithUserInfo);
